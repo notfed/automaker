@@ -1,0 +1,35 @@
+automaker-20101003
+
+This project is meant to automatically create a Makefile. It works like this: 
+
+	$ automaker *.c > Makefile
+
+	automakefile opens somefile.c and looks for a comment header and looks for a list of dependencies :
+                       	
+		/*
+		%use stralloc_ready;
+		%use stralloc_cats;
+		*/
+
+	The above example would mean the source code expects to be linked with modules stralloc_ready and stralloc_cats.  Each file (with an .o suffix) would be added to somefile's Makefile entry, along with any more dependencies generated after checking the file (with a .c suffix) for any of its dependencies, recursively.  
+
+
+We will first make tools that this project might consist of:
+
+	A tool to list all the direct dependencies for a specific C file:
+
+		$ automaker-list somefile.c
+		stralloc_ready stralloc_cats
+
+	A tool to list all the recursive dependencies for a specific C file:
+
+		$ automaker-list -r somefile.c
+		stralloc_ready stralloc_cats stralloc_copyb.c
+		$ automaker-list -rc somefile.c
+		stralloc_ready.c stralloc_cats.c stralloc_cats.c
+		$ automaker-list -r somefile.c
+		stralloc_ready.o stralloc_cats.o stralloc_cats.o
+
+
+	This 
+	It will compile a list of objects that this 
