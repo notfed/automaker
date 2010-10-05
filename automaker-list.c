@@ -1,10 +1,8 @@
 /* 
 %use critbit0_contains;
 %use critbit0_insert;
-%use critbit0_delete;
 %use open_read;
-%use buffer_putsalign;
-%use buffer_putflush;
+%use buffer_put;
 %use getln;
 */
 #include "critbit0.h"
@@ -29,7 +27,6 @@ int buffer_f_read(int fd, char *buf,int len)
 }
 
 #define puts(s) buffer_putsalign(buffer_1,(s))
-#define putc(c) buffer_PUTC(buffer_1,c)
 #define putflush() buffer_flush(buffer_1)
 int dependon(str0 m)
 {
@@ -38,31 +35,44 @@ int dependon(str0 m)
     int match;
     str0 newmod;
 
-    if(critbit0_contains(&modules,&m)) return 0;
+    if(critbit0_contains(&modules,&m)) {
+        buffer_puts(buffer_2,"skipping ");
+        buffer_puts(buffer_2,m);
+        buffer_putsflush(buffer_2,"\n");
+        return 0;
+    }
     if(!critbit0_insert(&modules,&pool,&m)) return 111;
 
-    buffer_putsflush(buffer_2,"depend\n");
+    buffer_putsflush(buffer_2,"depends for ");
+    buffer_putsflush(buffer_2,m);
+    buffer_putsflush(buffer_2,": ");
 
-    puts(m); putc("\n");
+    puts(m); puts("|"); puts("\n"); putflush();
 
     if((fd = open_read(m))<0) return 111;
     buffer_f->fd = fd;
 
+    rc = getln(buffer_f,&line,&match,'\n');
+    if(rc<0) { close(fd); return 111; }
+
+    if(!str_start(line.s,"/*")) { close(fd); return 0; }
+
     do {
-      rc = getln(buffer_f,&line,&match,'\n');
-      buffer_putsflush(buffer_2,"[check]\n");
-      
-      if(rc<0) break;
-      if(!str_start(line.s,"/*")) continue;
         
       rc = getln(buffer_f,&line,&match,'\n');
       if(rc<0) break;
-      if(!str_start(line.s,"%use ")) continue;
-      if(line.s[line.len-1]!=';') break;
-      line.s[line.len-1] = '.';
-      stralloc_append(&line,"c");
-      dependon(line.s+5);
 
+      if(str_start(line.s,"*/")) break;
+      if(line.len<=5) continue;
+      if(!str_start(line.s,"%use ")) continue;
+
+      if(line.s[line.len-2]!=';') continue;
+
+      line.s[line.len-2] = '.';
+      line.s[line.len-1] = 'c';
+      line.s[line.len] = 0;
+      if(dependon(line.s+5)!=0) break;
+      buffer_f->fd = fd;
     } while(match);
     
     close(fd);

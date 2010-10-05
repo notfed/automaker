@@ -1,3 +1,7 @@
+/*
+%use getln2;
+%use stralloc_catb;
+*/
 #include "buffer.h"
 #include "byte.h"
 #include "stralloc.h"
