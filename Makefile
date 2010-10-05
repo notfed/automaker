@@ -1,8 +1,8 @@
 test : it
-	./automaker-list `echo*.c`
+	./automaker-list automaker-list.c
 it : automaker-list
-automaker-list : automaker-list.o buffer_0.o buffer_1.o buffer_get.o buffer_put.o buffer_write.o str_len.o byte_chr.o byte_copy.o byte_copyr.o critbit0_contains.o critbit0_insert.o critbit0_insert.o error.o open_read.o getln.o getln2.o str_start.o str0_length.c str0_equalc.c stralloc_catb.o stralloc_copyb.o stralloc_ready.o stralloc_append.o alloc.o alloc_re.o limitmalloc_open.o limitmalloc_open_if2.o limitmalloc_close.o
-	diet cc -o automaker-list automaker-list.o buffer_0.o buffer_1.o buffer_get.o buffer_put.o buffer_write.o str_len.o byte_chr.o byte_copy.o byte_copyr.o critbit0_contains.o critbit0_insert.o error.o open_read.o getln.o getln2.o str_start.o str0_length.c str0_equalc.c stralloc_catb.o stralloc_copyb.o stralloc_ready.o stralloc_append.o alloc.o alloc_re.o limitmalloc_open.o limitmalloc_open_if2.c limitmalloc_close.c
+automaker-list : automaker-list.o buffer_0.o buffer_1.o buffer_2.o buffer_get.o buffer_put.o buffer_write.o str_len.o byte_chr.o byte_copy.o byte_copyr.o critbit0_contains.o critbit0_insert.o critbit0_insert.o error.o open_read.o getln.o getln2.o str_start.o str0_length.c str0_equalc.c stralloc_catb.o stralloc_copyb.o stralloc_ready.o stralloc_append.o alloc.o alloc_re.o limitmalloc_open.o limitmalloc_open_if2.o limitmalloc_close.o
+	diet cc -o automaker-list automaker-list.o buffer_0.o buffer_1.o buffer_2.o buffer_get.o buffer_put.o buffer_write.o str_len.o byte_chr.o byte_copy.o byte_copyr.o critbit0_contains.o critbit0_insert.o error.o open_read.o getln.o getln2.o str_start.o str0_length.c str0_equalc.c stralloc_catb.o stralloc_copyb.o stralloc_ready.o stralloc_append.o alloc.o alloc_re.o limitmalloc_open.o limitmalloc_open_if2.c limitmalloc_close.c
 automaker-list.o : automaker-list.c
 	cc -c automaker-list.c
 limitmalloc_open.o : limitmalloc_open.c
@@ -13,6 +13,8 @@ limitmalloc_open_if2.o : limitmalloc_open_if2.c
 	cc -c limitmalloc_open_if2.c
 buffer_1.o : buffer_1.c
 	cc -c buffer_1.c
+buffer_2.o : buffer_2.c
+	cc -c buffer_2.c
 buffer_put.o : buffer_put.c
 	cc -c buffer_put.c
 buffer_get.o : buffer_get.c
