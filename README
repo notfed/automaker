@@ -4,6 +4,31 @@ This project is meant to automatically create a Makefile. It works like this:
 
 	$ automaker *.c > Makefile
 
+	it keeps a critbit tree of module names and starts with main:
+
+main() {
+	automaker loops through all the named files, opening them one at a time and reading through them (only the first few lines, usually)
+	it takes the file name, strips the suffix, and does this:
+
+  loop() {
+	adds the stripped file name and adds it to the tree
+	it opens the file, makes sure the first line equals "/*", and scans each line up to "*/"
+	for each scanned line of the form "%use ${NAME};",
+            we assume ${NAME} is the name of a .c file WITHOUT the file extension
+	it then repeats the same process to that file with a .c file extension
+
+	
+	for(;;) {
+
+	it then scans for a newline character, followed by 
+                          the string "%use ", followed by 
+                          the *module name*, followed by a ";"
+	it then adds the module name to the critbit tree of modules
+	it then calls
+	if the next two characters are "*/", break;
+
+	}
+
 	automakefile opens somefile.c and looks for a comment header and looks for a list of dependencies :
                        	
 		/*

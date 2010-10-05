@@ -17,19 +17,26 @@ critbit0_tree modules;
 limitmalloc_pool pool = { 1024 };
 stralloc line = {0};
 
+#define puts(s) buffer_putsalign(buffer_1,(s))
+#define putc(c) buffer_PUTC(buffer_1,c)
+#define putflush() buffer_flush(buffer_1)
 int dependon(str0 m)
 {
     int fd;
+    int rc;
     int match;
     str0 newmod;
-    if(!critbit0_contains(&modules,m)) continue;
-    if(!critbit0_insert(&modules,&pool,m)) return 111;
-    buffer_putsalign(m); buffer_PUTC('\n');
-    fd = open_read(m);
-    if(fd<0) return 111;
+
+    if(critbit0_contains(&modules,&m)) return 0;
+    if(!critbit0_insert(&modules,&pool,&m)) return 111;
+
+    puts(m); putc("\n");
+
+    if((fd = open_read(m))<0) return 111;
 
     do {
       rc = getln(buffer_0,&line,&match,'\n');
+      
       if(rc<0) break;
       if(!str_start(line.s,"/*")) continue;
         
@@ -51,10 +58,11 @@ int main(int argc, char*argv[])
     int i,rc;
     str0 m;
     if(argc<=1) return 100;
+    puts("Listing modules: \n"); putflush();
     for(i=0;i<argc;i++)
     {
         if((rc=dependon(argv[i]))!=0) return rc;
     }
-    buffer_flush(buffer_1);
+    putflush();
     return 0;
 }
