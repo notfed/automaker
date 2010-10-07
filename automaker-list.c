@@ -1,9 +1,9 @@
 /* 
+%use open_read;
+%use getln;
 %use critbit0_insert;
 %use critbit0_contains;
-%use open_read;
 %use buffer_put;
-%use getln;
 */
 #include "critbit0.h"
 #include "str0.h"
@@ -55,9 +55,9 @@ int dependon(str0 m)
     stralloc_0(&nmod);
 
     if(count++ == 0) {
-       puts("./load -o "); puts(nmod.s); puts("\n"); putflush();
+        puts(nmod.s); puts(" :"); putflush();
     } else {
-        puts(" "); puts(m); puts(".o"); putflush();
+        puts(" "); puts(m); putflush();
     }
 
     if((fd = open_read(nmod.s))<0) return 111;
