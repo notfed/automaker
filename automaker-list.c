@@ -40,12 +40,15 @@ int dependon(str0 m)
     int fd;
     int rc;
     int match;
-    str0 newmod;
+
 
     if(critbit0_contains(&modules,&m)) return 0;
     if(!critbit0_insert(&modules,&pool,&m)) return 111;
 
+    /* m is a new module */
     stralloc_copys(&nmod,m);
+
+    /* make sure it ends with .c */
     if(! (nmod.len > 2 
           && nmod.s[nmod.len-2] == '.' 
           && nmod.s[nmod.len-1] == 'c')) 
@@ -54,37 +57,53 @@ int dependon(str0 m)
     }
     stralloc_0(&nmod);
 
+
+    /* Output differently for starting module */
     if(count++ == 0) {
         puts(nmod.s); puts(" :"); putflush();
     } else {
         puts(" "); puts(m); putflush();
     }
 
+    /* Open module source file */
     if((fd = open_read(nmod.s))<0) return 111;
     buffer_f->fd = fd;
 
+    /* Read first line */
     rc = getln(buffer_f,&line,&match,'\n');
     if(rc<0) { close(fd); return 111; }
 
+    /* Make sure first line is a comment start */
     if(!str_start(line.s,"/*")) { close(fd); return 0; }
 
     do {
         
+      /* Read next line */
       rc = getln(buffer_f,&line,&match,'\n');
       if(rc<0) break;
 
+      /* If line is a comment ender, we're done with this file */
       if(str_start(line.s,"*/")) break;
-      if(line.len<=8) continue;
-      if(!str_start(line.s,"%use ")) continue;
 
+      /* Make sure line is of format "%use MODULE;\n" */
+      if(line.len<8) continue;
+      if(!str_start(line.s,"%use ")) continue;
       if(line.s[line.len-2]!=';') continue;
 
+      /* Call dependon with this new module name */
       line.s[line.len-2] = 0;
-      if(dependon(line.s+5)!=0) { oops(); break; }
+      if(dependon(line.s+5)!=0) oops(); 
+
+
+      /* Restore open file descriptor */
       buffer_f->fd = fd;
+
     } while(match);
+
+    /* Flush the results to output */
     puts("\n"); putflush();
     close(fd);
+
     return 0;
 }
 int main(int argc, char*argv[])
@@ -99,6 +118,7 @@ int main(int argc, char*argv[])
     puts("Listing modules: \n"); putflush();
     for(i=1;i<argc;i++)
     {
+        count = 0;
         if((rc=dependon(argv[i]))!=0) return rc;
     }
     putflush();
