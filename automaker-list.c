@@ -76,11 +76,11 @@ int dependon(str0 m)
     /* Make sure first line is a comment start */
     if(!str_start(line.s,"/*")) { close(fd); return 0; }
 
-    do {
+    for(;;) {
         
       /* Read next line */
       rc = getln(buffer_f,&line,&match,'\n');
-      if(rc<0) break;
+      if(rc<0 || !match) break;
 
       /* If line is a comment ender, we're done with this file */
       if(str_start(line.s,"*/")) break;
@@ -94,11 +94,10 @@ int dependon(str0 m)
       line.s[line.len-2] = 0;
       if(dependon(line.s+5)!=0) oops(); 
 
-
       /* Restore open file descriptor */
       buffer_f->fd = fd;
 
-    } while(match);
+    } 
 
     /* Flush the results to output */
     puts("\n"); putflush();
