@@ -280,12 +280,13 @@ int main(int argc, char*argv[])
 
     }
 
-    /* make it */
-    if((rc=itall())!=0) return rc;
 
 
     /* list all modules to compile them */
     if((rc=compileall())!=0) return rc;
+
+    /* make it */
+    if((rc=itall())!=0) return rc;
 
     /* make clean */
     if((rc=cleanall())!=0) return rc;
