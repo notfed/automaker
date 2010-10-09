@@ -1,9 +1,19 @@
 /* 
-%use open_read;
-%use getln;
+%use stralloc_copys;
+%use stralloc_cats;
+%use stralloc_append;
 %use critbit0_insert;
 %use critbit0_contains;
+%use critbit0_allprefixed;
+%use critbit0_clear;
 %use buffer_put;
+%use buffer_0;
+%use buffer_1;
+%use buffer_2;
+%use strerr_sys;
+%use strerr_die;
+%use open_read;
+%use getln;
 */
 #include "critbit0.h"
 #include "str0.h"
