@@ -12,8 +12,13 @@
 #include "getln.h"
 #include "strerr.h"
 #include "error.h"
+#include "readwrite.h"
+#include "open.h"
+#include "str.h"
+
 
 critbit0_tree modules;
+critbit0_tree nextup;
 limitmalloc_pool pool = { 1024 };
 stralloc line = {0};
 
@@ -30,48 +35,53 @@ int buffer_f_read(int fd, char *buf,int len)
 
 #define puts(s) buffer_putsalign(buffer_1,(s))
 #define putflush() buffer_flush(buffer_1)
+#define put2s(s) buffer_putsalign(buffer_2,(s))
+#define put2flush() buffer_flush(buffer_2)
 #define check() buffer_putsflush(buffer_2,"[check]")
 #define oops() strerr_die1sys(errno,"oops: an error occured: ")
-stralloc nmod = {0};
 
+/* {m}.c */
+stralloc modc = {0};
+
+/* number of modules in tree */
 int count = 0;
+
+
+void debug(const char *str)
+{
+    buffer_puts(buffer_1,"[");
+    buffer_puts(buffer_1,str);
+    buffer_putsflush(buffer_1,"]\n");
+}
+
+/* Read the file {m}.c and read all of its dependencies into the tree */
 int dependon(str0 m)
 {
     int fd;
     int rc;
     int match;
+    str0 newmod;
 
-
+    /* No use in reading a module twice */
     if(critbit0_contains(&modules,&m)) return 0;
-    if(!critbit0_insert(&modules,&pool,&m)) return 111;
 
-    /* m is a new module */
-    stralloc_copys(&nmod,m);
+    /* Add the module to the tree */
+    if(!critbit0_insert(&modules,&pool,&m)) return 1;
+    critbit0_clear(&nextup,&pool);
+    count++;
 
-    /* make sure it ends with .c */
-    if(! (nmod.len > 2 
-          && nmod.s[nmod.len-2] == '.' 
-          && nmod.s[nmod.len-1] == 'c')) 
-    {
-      stralloc_cats(&nmod,".c"); 
-    }
-    stralloc_0(&nmod);
-
-
-    /* Output differently for starting module */
-    if(count++ == 0) {
-        puts(nmod.s); puts(" :"); putflush();
-    } else {
-        puts(" "); puts(m); putflush();
-    }
+    /* {m}.c is a new module */
+    stralloc_copys(&modc,m);
+    stralloc_cats(&modc,".c"); 
+    stralloc_0(&modc);
 
     /* Open module source file */
-    if((fd = open_read(nmod.s))<0) return 111;
+    if((fd = open_read(modc.s))<0) return 1;
     buffer_f->fd = fd;
 
     /* Read first line */
     rc = getln(buffer_f,&line,&match,'\n');
-    if(rc<0) { close(fd); return 111; }
+    if(rc<0) { close(fd); return 1; }
 
     /* Make sure first line is a comment start */
     if(!str_start(line.s,"/*")) { close(fd); return 0; }
@@ -89,37 +99,87 @@ int dependon(str0 m)
       if(line.len<8) continue;
       if(!str_start(line.s,"%use ")) continue;
       if(line.s[line.len-2]!=';') continue;
-
-      /* Call dependon with this new module name */
+ 
+      /* extract just the module name */
       line.s[line.len-2] = 0;
-      if(dependon(line.s+5)!=0) oops(); 
+      newmod = line.s + 5;
 
-      /* Restore open file descriptor */
-      buffer_f->fd = fd;
-
+      /* Put the name in the tree */
+      if(!critbit0_contains(&nextup,&newmod))
+        if(!critbit0_insert(&nextup,&pool,&newmod)) return 111;
     } 
 
-    /* Flush the results to output */
-    puts("\n"); putflush();
+    /* Done reading this file */
     close(fd);
+    return 0;
+}
 
+/* moredepends */
+str0 moredepends_arg;
+int moredepends_callback(void)
+{
+    if(dependon(moredepends_arg)!=0) return 0;
+    return 1;
+}
+int moredepends()
+{
+    str0 empty = "";
+    if(critbit0_allprefixed(&nextup, &pool, &moredepends_arg, &empty, moredepends_callback)<0) oops();
+    put2flush();
+    return 0;
+}
+
+/* showresults */
+str0 showresults_arg;
+int showresults_callback(void)
+{
+    debug(showresults_arg);
+    return 1;
+}
+int showresults()
+{
+    str0 empty = "";
+    if(critbit0_allprefixed(&nextup, &pool, &showresults_arg, &empty, showresults_callback)<0) oops();
+    put2flush();
     return 0;
 }
 int main(int argc, char*argv[])
 {
-    int i,rc;
-    str0 m;
+    int i,len,rc;
+    char *p;
     if(argc<=1) {
-        buffer_putsflush(buffer_2,
-             "automaker-list: usage: automaker-list [files ...]\n");
+        put2s("automaker-list: usage: automaker-list [files ...]\n");
+        put2flush();
         return 100;
     }
-    puts("Listing modules: \n"); putflush();
+    puts("Listing modules: \n"); 
+    putflush();
     for(i=1;i<argc;i++)
     {
+        /* grow a new tree */
+        critbit0_clear(&modules,&pool);
+        critbit0_clear(&nextup,&pool);
         count = 0;
+
+        /* chop off .c suffix */
+        p = argv[i];
+        len = str0_length(&p);
+        if((len > 2 
+          && p[len-2] == '.' 
+          && p[len-1] == 'c')) 
+        {
+          p[len-2] = 0;
+        }
+
+        /* add module to tree along with its dependents */
         if((rc=dependon(argv[i]))!=0) return rc;
+
+        /* recursively get more dependencies */
+       // if((rc=moredepends())!=0) return rc;
+
+        /* display all members of the tree */
+        if((rc=showresults())!=0) return rc;
     }
-    putflush();
+
     return 0;
 }
