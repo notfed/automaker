@@ -1,6 +1,7 @@
 /*
 %use stralloc_ready;
 %use buffer_get;
+%use byte_chr;
 */
 #include "buffer.h"
 #include "stralloc.h"
