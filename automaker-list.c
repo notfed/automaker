@@ -56,7 +56,7 @@ void debug(const char* pre, const char *str, const char* post)
     buffer_flush(buffer_1);
 }
 
-int err_readfailed(str0 dep)
+void err_readfailed(str0 dep)
 {
     put2s("automaker-list: error: could not open '");
     put2s(dep);
@@ -87,7 +87,13 @@ int dependon(str0 m)
     stralloc_0(&modc);
 
     /* Open module source file */
-    if((fd = open_read(modc.s))<0) err_readfailed(modc.s);
+    for(;;) {
+        fd = open_read(modc.s);
+        if(fd>=0) break;
+        if(errno == error_intr)  { sleep(1); continue; }
+        err_readfailed(modc.s);
+    } 
+
     buffer_f->fd = fd;
     buffer_f->p = 0;
 
