@@ -1,14 +1,14 @@
 test : it
-	./automaker-list automaker-list.c
-it : automaker-list
-automaker-list : load automaker-list.o alloc.o alloc_re.o buffer_0.o buffer_1.o buffer_2.o buffer_get.o buffer_put.o buffer_write.o byte_chr.o byte_copy.o byte_copyr.o critbit0_allprefixed.o critbit0_clear.o critbit0_contains.o critbit0_insert.o error.o error_str.o getln.o getln2.o limitmalloc_close.o limitmalloc_open.o limitmalloc_open_if2.o open_read.o str0_copyc.o str0_equalc.o str0_free.o str0_length.o str_len.o str_start.o stralloc_append.o stralloc_catb.o stralloc_cats.o stralloc_copyb.o stralloc_copys.o stralloc_ready.o strerr_die.o strerr_sys.o
-	./load automaker-list alloc.o alloc_re.o buffer_0.o buffer_1.o buffer_2.o buffer_get.o buffer_put.o buffer_write.o byte_chr.o byte_copy.o byte_copyr.o critbit0_allprefixed.o critbit0_clear.o critbit0_contains.o critbit0_insert.o error.o error_str.o getln.o getln2.o limitmalloc_close.o limitmalloc_open.o limitmalloc_open_if2.o open_read.o str0_copyc.o str0_equalc.o str0_free.o str0_length.o str_len.o str_start.o stralloc_append.o stralloc_catb.o stralloc_cats.o stralloc_copyb.o stralloc_copys.o stralloc_ready.o strerr_die.o strerr_sys.o
+	./automaker automaker.c
+it : automaker
+automaker : load automaker.o alloc.o alloc_re.o buffer_0.o buffer_1.o buffer_2.o buffer_get.o buffer_put.o buffer_write.o byte_chr.o byte_copy.o byte_copyr.o critbit0_allprefixed.o critbit0_clear.o critbit0_contains.o critbit0_insert.o error.o error_str.o getln.o getln2.o limitmalloc_close.o limitmalloc_open.o limitmalloc_open_if2.o open_read.o str0_copyc.o str0_equalc.o str0_free.o str0_length.o str_len.o str_start.o stralloc_append.o stralloc_catb.o stralloc_cats.o stralloc_copyb.o stralloc_copys.o stralloc_ready.o strerr_die.o strerr_sys.o
+	./load automaker alloc.o alloc_re.o buffer_0.o buffer_1.o buffer_2.o buffer_get.o buffer_put.o buffer_write.o byte_chr.o byte_copy.o byte_copyr.o critbit0_allprefixed.o critbit0_clear.o critbit0_contains.o critbit0_insert.o error.o error_str.o getln.o getln2.o limitmalloc_close.o limitmalloc_open.o limitmalloc_open_if2.o open_read.o str0_copyc.o str0_equalc.o str0_free.o str0_length.o str_len.o str_start.o stralloc_append.o stralloc_catb.o stralloc_cats.o stralloc_copyb.o stralloc_copys.o stralloc_ready.o strerr_die.o strerr_sys.o
 alloc.o : compile alloc.c
 	./compile alloc.c
 alloc_re.o : compile alloc_re.c
 	./compile alloc_re.c
-automaker-list.o : compile automaker-list.c
-	./compile automaker-list.c
+automaker.o : compile automaker.c
+	./compile automaker.c
 buffer_0.o : compile buffer_0.c
 	./compile buffer_0.c
 buffer_1.o : compile buffer_1.c
@@ -80,4 +80,4 @@ strerr_die.o : compile strerr_die.c
 strerr_sys.o : compile strerr_sys.c
 	./compile strerr_sys.c
 clean :
-	rm -f *.o automaker-list
+	rm -f *.o automaker

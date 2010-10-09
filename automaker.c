@@ -70,7 +70,7 @@ void debug(const char* pre, const char *str, const char* post)
 
 void err_readfailed(str0 dep)
 {
-    put2s("automaker-list: error: could not open '");
+    put2s("automaker: error: could not open '");
     put2s(dep);
     put2s("'\n");
     put2flush();
@@ -189,7 +189,6 @@ int loadall(str0 modname)
     if(critbit0_allprefixed(&nextup, 0, &loadall_arg, &empty, loadall_callback)<0) oops();
     puts("\n");
 
-    putflush();
     return 0;
 }
 
@@ -205,7 +204,6 @@ int compileall()
 {
     str0 empty = "";
     if(critbit0_allprefixed(&allmodules, 0, &compileall_arg, &empty, compileall_callback)<0) oops();
-    putflush();
     return 0;
 }
 
@@ -222,7 +220,6 @@ int itall()
     puts("it :");
     if(critbit0_allprefixed(&executables, 0, &itall_arg, &empty, itall_callback)<0) oops();
     puts("\n");
-    putflush();
     return 0;
 }
 
@@ -240,7 +237,6 @@ int cleanall()
     puts("clean : \n	rm -f *.o");
     if(critbit0_allprefixed(&executables, 0, &cleanall_arg, &empty, cleanall_callback)<0) oops();
     puts("\n");
-    putflush();
     return 0;
 }
 
@@ -249,7 +245,7 @@ int main(int argc, char*argv[])
     int i,len,rc;
     char *p;
     if(argc<=1) {
-        put2s("automaker-list: usage: automaker-list [files ...]\n");
+        put2s("automaker: usage: automaker [files ...]\n");
         put2flush();
         return 100;
     }
@@ -298,6 +294,8 @@ int main(int argc, char*argv[])
     critbit0_clear(&executables,&pool);
     critbit0_clear(&modules,&pool);
     critbit0_clear(&nextup,&pool);
+
+    putflush();
 
     return 0;
 }
