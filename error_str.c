@@ -1,3 +1,6 @@
+/*
+%use error;
+*/
 #include <errno.h>
 #include "error.h"
 
