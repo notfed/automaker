@@ -1,8 +1,8 @@
 test : it
 	./automaker automaker.c
 it : automaker
-automaker : load automaker.o alloc.o alloc_re.o buffer_0.o buffer_1.o buffer_2.o buffer_get.o buffer_put.o buffer_write.o byte_chr.o byte_copy.o byte_copyr.o critbit0_allprefixed.o critbit0_clear.o critbit0_contains.o critbit0_insert.o error.o error_str.o getln.o getln2.o limitmalloc_close.o limitmalloc_open.o limitmalloc_open_if2.o open_read.o str0_copyc.o str0_equalc.o str0_free.o str0_length.o str_len.o str_start.o stralloc_append.o stralloc_catb.o stralloc_cats.o stralloc_copyb.o stralloc_copys.o stralloc_ready.o strerr_die.o strerr_sys.o
-	./load automaker alloc.o alloc_re.o buffer_0.o buffer_1.o buffer_2.o buffer_get.o buffer_put.o buffer_write.o byte_chr.o byte_copy.o byte_copyr.o critbit0_allprefixed.o critbit0_clear.o critbit0_contains.o critbit0_insert.o error.o error_str.o getln.o getln2.o limitmalloc_close.o limitmalloc_open.o limitmalloc_open_if2.o open_read.o str0_copyc.o str0_equalc.o str0_free.o str0_length.o str_len.o str_start.o stralloc_append.o stralloc_catb.o stralloc_cats.o stralloc_copyb.o stralloc_copys.o stralloc_ready.o strerr_die.o strerr_sys.o
+automaker : load automaker.o alloc.o alloc_re.o buffer_0.o buffer_1.o buffer_2.o buffer_get.o buffer_init.o buffer_put.o buffer_write.o byte_chr.o byte_copy.o byte_copyr.o critbit0_allprefixed.o critbit0_clear.o critbit0_contains.o critbit0_insert.o error.o error_str.o getln.o getln2.o limitmalloc_close.o limitmalloc_open.o limitmalloc_open_if2.o open_read.o str0_copyc.o str0_equalc.o str0_free.o str0_length.o str_len.o str_start.o stralloc_append.o stralloc_catb.o stralloc_cats.o stralloc_copyb.o stralloc_copys.o stralloc_ready.o strerr_die.o strerr_sys.o
+	./load automaker alloc.o alloc_re.o buffer_0.o buffer_1.o buffer_2.o buffer_get.o buffer_init.o buffer_put.o buffer_write.o byte_chr.o byte_copy.o byte_copyr.o critbit0_allprefixed.o critbit0_clear.o critbit0_contains.o critbit0_insert.o error.o error_str.o getln.o getln2.o limitmalloc_close.o limitmalloc_open.o limitmalloc_open_if2.o open_read.o str0_copyc.o str0_equalc.o str0_free.o str0_length.o str_len.o str_start.o stralloc_append.o stralloc_catb.o stralloc_cats.o stralloc_copyb.o stralloc_copys.o stralloc_ready.o strerr_die.o strerr_sys.o
 alloc.o : compile alloc.c
 	./compile alloc.c
 alloc_re.o : compile alloc_re.c
@@ -17,6 +17,8 @@ buffer_2.o : compile buffer_2.c
 	./compile buffer_2.c
 buffer_get.o : compile buffer_get.c
 	./compile buffer_get.c
+buffer_init.o : compile buffer_init.c
+	./compile buffer_init.c
 buffer_put.o : compile buffer_put.c
 	./compile buffer_put.c
 buffer_write.o : compile buffer_write.c

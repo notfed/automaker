@@ -1,20 +1,22 @@
 /* 
-%use stralloc_copys;
-%use stralloc_cats;
-%use stralloc_append;
+%use buffer_0;
+%use buffer_1;
+%use buffer_2;
+%use buffer_init;
+%use buffer_put;
+%use buffer_get;
 %use critbit0_insert;
 %use critbit0_contains;
 %use critbit0_allprefixed;
 %use critbit0_clear;
-%use buffer_put;
-%use buffer_0;
-%use buffer_1;
-%use buffer_2;
+%use getln;
+%use open_read;
+%use str_start;
+%use stralloc_copys;
+%use stralloc_cats;
+%use stralloc_append;
 %use strerr_sys;
 %use strerr_die;
-%use open_read;
-%use getln;
-%use str_start;
 */
 #include "critbit0.h"
 #include "str0.h"
@@ -91,9 +93,7 @@ static int dependon(str0 m)
         if(errno == error_intr)  { sleep(1); continue; }
         err_readfailed(modc.s);
     } 
-
-    buffer_f->fd = fd;
-    buffer_f->p = 0;
+    buffer_init(buffer_f,buffer_f_read,fd,buffer_f_space,sizeof buffer_f_space);
 
     /* Read first line */
     rc = getln(buffer_f,&line,&match,'\n');
