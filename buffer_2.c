@@ -1,5 +1,6 @@
 /*
 %use buffer_put;
+%use buffer_write;
 */
 #include "buffer.h"
 
