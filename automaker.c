@@ -51,12 +51,21 @@ static buffer buffer_f;
 /* {m}.c */
 static stralloc modc = {0};
 
+static void cleanup()
+{
+    critbit0_clear(&executables,&pool);
+    critbit0_clear(&modules,&pool);
+    critbit0_clear(&allmodules,&pool);
+    critbit0_clear(&nextup,&pool);
+}
+
 static void err_readfailed(str0 dep)
 {
     put2s("automaker: error: could not open '");
     put2s(dep);
     put2s("'\n");
     put2flush();
+    cleanup();
     _exit(111);
 }
 
@@ -271,10 +280,7 @@ int main(int argc, char*argv[])
     if((rc=cleanall())!=0) return rc;
 
     /* Cleanup time */
-    critbit0_clear(&executables,&pool);
-    critbit0_clear(&modules,&pool);
-    critbit0_clear(&allmodules,&pool);
-    critbit0_clear(&nextup,&pool);
+    cleanup();
 
     putflush();
 
