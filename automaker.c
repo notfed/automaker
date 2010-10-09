@@ -38,9 +38,8 @@ static limitmalloc_pool pool = { 4096 };
 static stralloc line = {0};
 
 /* File read buffer */
-static int buffer_f_read(int fd,char *buf,int len);
 static char buffer_f_space[BUFFER_INSIZE];
-static buffer it = BUFFER_INIT(buffer_f_read,-1,buffer_f_space,sizeof buffer_f_space);
+static buffer it;
 static buffer *buffer_f = &it;
 static int buffer_f_read(int fd, char *buf,int len)
 {
