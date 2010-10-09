@@ -279,6 +279,7 @@ int main(int argc, char*argv[])
     /* Cleanup time */
     critbit0_clear(&executables,&pool);
     critbit0_clear(&modules,&pool);
+    critbit0_clear(&allmodules,&pool);
     critbit0_clear(&nextup,&pool);
 
     putflush();
