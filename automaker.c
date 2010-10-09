@@ -81,8 +81,8 @@ static int dependon(str0 m)
     if(critbit0_contains(&modules,&m)) return 0;
 
     /* Add the module to the tree */
-    if(!critbit0_insert(&modules,0,&m)) return 1;
-    if(!critbit0_insert(&allmodules,0,&m)) return 1;
+    if(!critbit0_insert(&modules,&pool,&m)) return 1;
+    if(!critbit0_insert(&allmodules,&pool,&m)) return 1;
 
     /* {m}.c is a new module */
     stralloc_copys(&modc,m);
@@ -151,7 +151,7 @@ static int moredepends()
     do {
       oldcount = newcount;
       newcount = 0;
-      if(critbit0_allprefixed(&nextup, 0, &moredepends_arg, &empty, moredepends_callback)!=1) oops();
+      if(critbit0_allprefixed(&nextup, &pool, &moredepends_arg, &empty, moredepends_callback)!=1) oops();
     } while(newcount!=oldcount);
     return 0;
 }
@@ -170,12 +170,12 @@ static int loadall(str0 modname)
     /* First line */
     puts(modname); puts(" : load "); 
     puts(modname); puts(".o");
-    if(critbit0_allprefixed(&nextup, 0, &loadall_arg, &empty, loadall_callback)!=1) oops();
+    if(critbit0_allprefixed(&nextup, &pool, &loadall_arg, &empty, loadall_callback)!=1) oops();
     puts("\n");
 
     /* Second line */
     puts("	./load "); puts(modname); 
-    if(critbit0_allprefixed(&nextup, 0, &loadall_arg, &empty, loadall_callback)!=1) oops();
+    if(critbit0_allprefixed(&nextup, &pool, &loadall_arg, &empty, loadall_callback)!=1) oops();
     puts("\n");
 
     return 0;
@@ -192,7 +192,7 @@ static int compileall_callback(void)
 static int compileall()
 {
     str0 empty = "";
-    if(critbit0_allprefixed(&allmodules, 0, &compileall_arg, &empty, compileall_callback)!=1) oops();
+    if(critbit0_allprefixed(&allmodules, &pool, &compileall_arg, &empty, compileall_callback)!=1) oops();
     return 0;
 }
 
@@ -207,7 +207,7 @@ static int itall()
 {
     str0 empty = "";
     puts("it :");
-    if(critbit0_allprefixed(&executables, 0, &itall_arg, &empty, itall_callback)!=1) oops();
+    if(critbit0_allprefixed(&executables, &pool, &itall_arg, &empty, itall_callback)!=1) oops();
     puts("\n");
     return 0;
 }
@@ -224,7 +224,7 @@ static int cleanall()
 {
     str0 empty = "";
     puts("clean : \n	rm -f *.o");
-    if(critbit0_allprefixed(&executables, 0, &cleanall_arg, &empty, cleanall_callback)!=1) oops();
+    if(critbit0_allprefixed(&executables, &pool, &cleanall_arg, &empty, cleanall_callback)!=1) oops();
     puts("\n");
     return 0;
 }
