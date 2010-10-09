@@ -28,19 +28,19 @@
 #include "str.h"
 
 
-critbit0_tree modules;
-critbit0_tree nextup;
-critbit0_tree allmodules;
-critbit0_tree executables;
-limitmalloc_pool pool = { 4096 };
-stralloc line = {0};
+static critbit0_tree modules;
+static critbit0_tree nextup;
+static critbit0_tree allmodules;
+static critbit0_tree executables;
+static limitmalloc_pool pool = { 4096 };
+static stralloc line = {0};
 
 /* File read buffer */
-int buffer_f_read(int fd,char *buf,int len);
-char buffer_f_space[BUFFER_INSIZE];
+static int buffer_f_read(int fd,char *buf,int len);
+static char buffer_f_space[BUFFER_INSIZE];
 static buffer it = BUFFER_INIT(buffer_f_read,-1,buffer_f_space,sizeof buffer_f_space);
-buffer *buffer_f = &it;
-int buffer_f_read(int fd, char *buf,int len)
+static buffer *buffer_f = &it;
+static int buffer_f_read(int fd, char *buf,int len)
 {
   if (buffer_flush(buffer_f) == -1) return -1;
   return read(fd,buf,len);
@@ -50,25 +50,12 @@ int buffer_f_read(int fd, char *buf,int len)
 #define putflush() buffer_flush(buffer_1)
 #define put2s(s) buffer_putsalign(buffer_2,(s))
 #define put2flush() buffer_flush(buffer_2)
-#define check() buffer_putsflush(buffer_2,"[check]")
 #define oops() strerr_die1sys(errno,"oops: an error occured: ")
 
 /* {m}.c */
-stralloc modc = {0};
+static stralloc modc = {0};
 
-/* number of modules in tree */
-int count = 0;
-
-
-void debug(const char* pre, const char *str, const char* post)
-{
-    buffer_putsalign(buffer_1,pre);
-    buffer_putsalign(buffer_1,str);
-    buffer_putsalign(buffer_1,post);
-    buffer_flush(buffer_1);
-}
-
-void err_readfailed(str0 dep)
+static void err_readfailed(str0 dep)
 {
     put2s("automaker: error: could not open '");
     put2s(dep);
@@ -78,7 +65,7 @@ void err_readfailed(str0 dep)
 }
 
 /* Read the file {m}.c and read all of its dependencies into the tree */
-int dependon(str0 m)
+static int dependon(str0 m)
 {
     int fd;
     int rc;
@@ -91,7 +78,6 @@ int dependon(str0 m)
     /* Add the module to the tree */
     if(!critbit0_insert(&modules,0,&m)) return 1;
     if(!critbit0_insert(&allmodules,0,&m)) return 1;
-    count++;
 
     /* {m}.c is a new module */
     stralloc_copys(&modc,m);
@@ -145,15 +131,15 @@ int dependon(str0 m)
 }
 
 /* moredepends */
-int newcount;
-str0 moredepends_arg;
+static int newcount;
+static str0 moredepends_arg;
 int moredepends_callback(void)
 {
     ++newcount;
     if(dependon(moredepends_arg)!=0) return 0;
     return 1;
 }
-int moredepends()
+static int moredepends()
 {
     int oldcount;
     str0 empty = "";
@@ -168,13 +154,13 @@ int moredepends()
 }
 
 /* loadall */
-str0 loadall_arg;
-int loadall_callback(void)
+static str0 loadall_arg;
+static int loadall_callback(void)
 {
     puts(" "); puts(loadall_arg); puts(".o");
     return 1;
 }
-int loadall(str0 modname)
+static int loadall(str0 modname)
 {
     str0 empty = "";
 
@@ -193,14 +179,14 @@ int loadall(str0 modname)
 }
 
 /* compileall */
-str0 compileall_arg;
-int compileall_callback(void)
+static str0 compileall_arg;
+static int compileall_callback(void)
 {
     puts(compileall_arg); puts(".o : compile "); puts(compileall_arg); puts(".c\n");
     puts("	./compile "); puts(compileall_arg); puts(".c\n");
     return 1;
 }
-int compileall()
+static int compileall()
 {
     str0 empty = "";
     if(critbit0_allprefixed(&allmodules, 0, &compileall_arg, &empty, compileall_callback)<0) oops();
@@ -208,13 +194,13 @@ int compileall()
 }
 
 /* itall */
-str0 itall_arg;
-int itall_callback(void)
+static str0 itall_arg;
+static int itall_callback(void)
 {
     puts(" "); puts(itall_arg);
     return 1;
 }
-int itall()
+static int itall()
 {
     str0 empty = "";
     puts("it :");
@@ -224,14 +210,14 @@ int itall()
 }
 
 /* cleanall */
-str0 cleanall_arg;
-int cleanall_callback(void)
+static str0 cleanall_arg;
+static int cleanall_callback(void)
 {
     puts(" ");
     puts(cleanall_arg);
     return 1;
 }
-int cleanall()
+static int cleanall()
 {
     str0 empty = "";
     puts("clean : \n	rm -f *.o");
@@ -255,7 +241,6 @@ int main(int argc, char*argv[])
         /* grow a new tree */
         critbit0_clear(&modules,&pool);
         critbit0_clear(&nextup,&pool);
-        count = 0;
 
         /* chop off .c suffix */
         p = argv[i];
