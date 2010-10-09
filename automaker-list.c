@@ -192,7 +192,7 @@ int compileall_callback(void)
 int compileall()
 {
     str0 empty = "";
-    if(critbit0_allprefixed(&nextup, &pool, &compileall_arg, &empty, compileall_callback)<0) oops();
+    if(critbit0_allprefixed(&allmodules, &pool, &compileall_arg, &empty, compileall_callback)<0) oops();
     putflush();
     return 0;
 }
