@@ -140,6 +140,7 @@ int moredepends_callback(void)
 {
     ++newcount;
     if(dependon(moredepends_arg)!=0) return 0;
+    str0_free(&moredepends_arg,&pool);
     return 1;
 }
 static int moredepends()
@@ -161,6 +162,7 @@ static str0 loadall_arg;
 static int loadall_callback(void)
 {
     puts(" "); puts(loadall_arg); puts(".o");
+    str0_free(&loadall_arg,&pool);
     return 1;
 }
 static int loadall(str0 modname)
@@ -187,6 +189,7 @@ static int compileall_callback(void)
 {
     puts(compileall_arg); puts(".o : compile "); puts(compileall_arg); puts(".c\n");
     puts("	./compile "); puts(compileall_arg); puts(".c\n");
+    str0_free(&compileall_arg,&pool);
     return 1;
 }
 static int compileall()
@@ -201,6 +204,7 @@ static str0 itall_arg;
 static int itall_callback(void)
 {
     puts(" "); puts(itall_arg);
+    str0_free(&itall_arg,&pool);
     return 1;
 }
 static int itall()
@@ -218,6 +222,7 @@ static int cleanall_callback(void)
 {
     puts(" ");
     puts(cleanall_arg);
+    str0_free(&cleanall_arg,&pool);
     return 1;
 }
 static int cleanall()
