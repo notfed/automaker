@@ -5,6 +5,7 @@
 %use buffer_init;
 %use buffer_put;
 %use buffer_get;
+%use buffer_read;
 %use critbit0_insert;
 %use critbit0_contains;
 %use critbit0_allprefixed;
@@ -39,13 +40,7 @@ static stralloc line = {0};
 
 /* File read buffer */
 static char buffer_f_space[BUFFER_INSIZE];
-static buffer it;
-static buffer *buffer_f = &it;
-static int buffer_f_read(int fd, char *buf,int len)
-{
-  if (buffer_flush(buffer_f) == -1) return -1;
-  return read(fd,buf,len);
-}
+static buffer buffer_f;
 
 #define puts(s) buffer_putsalign(buffer_1,(s))
 #define putflush() buffer_flush(buffer_1)
@@ -92,10 +87,10 @@ static int dependon(str0 m)
         if(errno == error_intr)  { sleep(1); continue; }
         err_readfailed(modc.s);
     } 
-    buffer_init(buffer_f,buffer_f_read,fd,buffer_f_space,sizeof buffer_f_space);
+    buffer_init(&buffer_f,buffer_unixread,fd,buffer_f_space,sizeof buffer_f_space);
 
     /* Read first line */
-    rc = getln(buffer_f,&line,&match,'\n');
+    rc = getln(&buffer_f,&line,&match,'\n');
     if(rc<0) { close(fd); return 1; }
 
     /* Make sure first line is a comment start */
@@ -104,7 +99,7 @@ static int dependon(str0 m)
     for(;;) {
         
       /* Read next line */
-      rc = getln(buffer_f,&line,&match,'\n');
+      rc = getln(&buffer_f,&line,&match,'\n');
       if(rc<0 || !match) break;
 
       /* If line is a comment ender, we're done with this file */
