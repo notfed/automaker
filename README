@@ -1,6 +1,6 @@
 automaker-20101003
 
-This project is meant to automatically create a Makefile. 
+This project is meant to automatically create a Makefile for C projects. 
 
 For example, given a source file 'test.c' to produce a Makefile that will produce 'test' along with any dependencies:
 
