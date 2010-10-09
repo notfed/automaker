@@ -1,3 +1,6 @@
+/*
+%use buffer_put;
+*/
 #include "readwrite.h"
 #include "buffer.h"
 
