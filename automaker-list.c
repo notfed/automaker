@@ -14,6 +14,7 @@
 %use strerr_die;
 %use open_read;
 %use getln;
+%use str_start;
 */
 #include "critbit0.h"
 #include "str0.h"
