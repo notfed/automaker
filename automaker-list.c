@@ -19,6 +19,7 @@
 
 critbit0_tree modules;
 critbit0_tree nextup;
+critbit0_tree allmodules;
 limitmalloc_pool pool = { 4096 };
 stralloc line = {0};
 
@@ -55,6 +56,15 @@ void debug(const char* pre, const char *str, const char* post)
     buffer_flush(buffer_1);
 }
 
+int err_readfailed(str0 dep)
+{
+    put2s("automaker-list: error: could not open '");
+    put2s(dep);
+    put2s("'\n");
+    put2flush();
+    _exit(111);
+}
+
 /* Read the file {m}.c and read all of its dependencies into the tree */
 int dependon(str0 m)
 {
@@ -68,6 +78,7 @@ int dependon(str0 m)
 
     /* Add the module to the tree */
     if(!critbit0_insert(&modules,&pool,&m)) return 1;
+    if(!critbit0_insert(&allmodules,0,&m)) return 1;
     count++;
 
     /* {m}.c is a new module */
@@ -76,7 +87,7 @@ int dependon(str0 m)
     stralloc_0(&modc);
 
     /* Open module source file */
-    if((fd = open_read(modc.s))<0) return 1;
+    if((fd = open_read(modc.s))<0) err_readfailed(modc.s);
     buffer_f->fd = fd;
     buffer_f->p = 0;
 
@@ -138,28 +149,44 @@ int moredepends()
     return 0;
 }
 
-/* showresults */
-str0 showresults_arg;
-int showresults_callback(void)
+/* loadall */
+str0 loadall_arg;
+int loadall_callback(void)
 {
-    puts(" "); puts(showresults_arg); puts(".o");
+    puts(" "); puts(loadall_arg); puts(".o");
     return 1;
 }
-int showresults(str0 modname)
+int loadall(str0 modname)
 {
     str0 empty = "";
 
     /* First line */
     puts(modname); puts(" : load "); 
     puts(modname); puts(".o");
-    if(critbit0_allprefixed(&nextup, &pool, &showresults_arg, &empty, showresults_callback)<0) oops();
+    if(critbit0_allprefixed(&nextup, &pool, &loadall_arg, &empty, loadall_callback)<0) oops();
     puts("\n");
 
     /* Second line */
     puts("	./load "); puts(modname); 
-    if(critbit0_allprefixed(&nextup, &pool, &showresults_arg, &empty, showresults_callback)<0) oops();
+    if(critbit0_allprefixed(&nextup, &pool, &loadall_arg, &empty, loadall_callback)<0) oops();
     puts("\n");
 
+    putflush();
+    return 0;
+}
+
+/* compileall */
+str0 compileall_arg;
+int compileall_callback(void)
+{
+    puts(compileall_arg); puts(".o : compile "); puts(compileall_arg); puts(".c\n");
+    puts("	./compile "); puts(compileall_arg); puts(".c\n");
+    return 1;
+}
+int compileall()
+{
+    str0 empty = "";
+    if(critbit0_allprefixed(&nextup, &pool, &compileall_arg, &empty, compileall_callback)<0) oops();
     putflush();
     return 0;
 }
@@ -195,9 +222,12 @@ int main(int argc, char*argv[])
         /* recursively get more dependencies */
         if((rc=moredepends())!=0) return rc;
 
-        /* display all members of the tree */
-        if((rc=showresults(argv[i]))!=0) return rc;
+        /* list all executable modules to load them */
+        if((rc=loadall(argv[i]))!=0) return rc;
     }
+
+    /* list all modules to compile them */
+    if((rc=compileall())!=0) return rc;
 
     return 0;
 }
