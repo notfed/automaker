@@ -1,3 +1,6 @@
+/*
+%use error;
+*/
 #include "alloc.h"
 #include "error.h"
 extern char *malloc();

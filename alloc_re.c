@@ -1,3 +1,7 @@
+/*
+%use byte_copy;
+%use alloc;
+*/
 #include "alloc.h"
 #include "byte.h"
 
