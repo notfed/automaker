@@ -45,9 +45,7 @@ static buffer buffer_f;
 
 #define puts(s) buffer_putsalign(buffer_1,(s))
 #define putflush() buffer_flush(buffer_1)
-#define put2s(s) buffer_putsalign(buffer_2,(s))
-#define put2flush() buffer_flush(buffer_2)
-#define oops() strerr_die1sys(errno,"oops: an error occured: ")
+#define FATAL "automaker: error: "
 
 /* {m}.c */
 static stralloc modc = {0};
@@ -62,22 +60,21 @@ static void cleanup()
 
 static void err_readfailed(str0 dep)
 {
-    put2s("automaker: error: could not open '");
-    put2s(dep);
-    put2s("'\n");
-    put2flush();
-    cleanup();
+    strerr_die4sys(111,FATAL,"failed to open '",dep,"'");
+}
+static void err_memsoft()
+{
+    strerr_die2x(111,FATAL,"memory limit exceeded");
+}
+static void err_memhard()
+{
     _exit(111);
 }
-
 static void forceclose(int fd)
 {
     if(close(fd)==-1) 
     {
-      put2s("automaker: error: failed failed to close file descriptor\n");
-      put2flush();
-      cleanup();
-      _exit(111);
+      strerr_die2sys(111,FATAL,"failed to close file descriptor");
     }
 }
 
@@ -93,13 +90,13 @@ static int dependon(str0 m)
     if(critbit0_contains(&modules,&m)) return 0;
 
     /* Add the module to the tree */
-    if(!critbit0_insert(&modules,&pool,&m)) return 1;
-    if(!critbit0_insert(&allmodules,&pool,&m)) return 1;
+    if(!critbit0_insert(&modules,&pool,&m)) err_memsoft();
+    if(!critbit0_insert(&allmodules,&pool,&m)) err_memsoft();
 
     /* {m}.c is a new module */
-    stralloc_copys(&modc,m);
-    stralloc_cats(&modc,".c"); 
-    stralloc_0(&modc);
+    if(!stralloc_copys(&modc,m)) err_memhard();
+    if(!stralloc_cats(&modc,".c")) err_memhard(); 
+    if(!stralloc_0(&modc)) err_memhard();
 
     /* Open module source file */
     for(;;) {
@@ -137,7 +134,7 @@ static int dependon(str0 m)
 
       /* Put the name in the tree */
       if(!critbit0_contains(&nextup,&newmod))
-        if(!critbit0_insert(&nextup,&pool,&newmod)) return 111;
+        if(!critbit0_insert(&nextup,&pool,&newmod)) err_memsoft();
     } 
 
     /* Done reading this file */
@@ -164,7 +161,8 @@ static int moredepends()
     do {
       oldcount = newcount;
       newcount = 0;
-      if(critbit0_allprefixed(&nextup, &pool, &moredepends_arg, &empty, moredepends_callback)!=1) oops();
+      if(critbit0_allprefixed(&nextup, &pool, &moredepends_arg, &empty, moredepends_callback)!=1) 
+          err_memsoft();
     } while(newcount!=oldcount);
     return 0;
 }
@@ -184,12 +182,14 @@ static int loadall(str0 modname)
     /* First line */
     puts(modname); puts(" : load "); 
     puts(modname); puts(".o");
-    if(critbit0_allprefixed(&nextup, &pool, &loadall_arg, &empty, loadall_callback)!=1) oops();
+    if(critbit0_allprefixed(&nextup, &pool, &loadall_arg, &empty, loadall_callback)!=1)
+          err_memsoft();
     puts("\n");
 
     /* Second line */
     puts("	./load "); puts(modname); 
-    if(critbit0_allprefixed(&nextup, &pool, &loadall_arg, &empty, loadall_callback)!=1) oops();
+    if(critbit0_allprefixed(&nextup, &pool, &loadall_arg, &empty, loadall_callback)!=1)
+          err_memsoft();
     puts("\n");
 
     return 0;
@@ -207,7 +207,8 @@ static int compileall_callback(void)
 static int compileall()
 {
     str0 empty = "";
-    if(critbit0_allprefixed(&allmodules, &pool, &compileall_arg, &empty, compileall_callback)!=1) oops();
+    if(critbit0_allprefixed(&allmodules, &pool, &compileall_arg, &empty, compileall_callback)!=1) 
+          err_memsoft();
     return 0;
 }
 
@@ -223,7 +224,8 @@ static int itall()
 {
     str0 empty = "";
     puts("it :");
-    if(critbit0_allprefixed(&executables, &pool, &itall_arg, &empty, itall_callback)!=1) oops();
+    if(critbit0_allprefixed(&executables, &pool, &itall_arg, &empty, itall_callback)!=1) 
+          err_memsoft();
     puts("\n");
     return 0;
 }
@@ -241,7 +243,8 @@ static int cleanall()
 {
     str0 empty = "";
     puts("clean : \n	rm -f *.o");
-    if(critbit0_allprefixed(&executables, &pool, &cleanall_arg, &empty, cleanall_callback)!=1) oops();
+    if(critbit0_allprefixed(&executables, &pool, &cleanall_arg, &empty, cleanall_callback)!=1)
+          err_memsoft();
     puts("\n");
     return 0;
 }
@@ -251,9 +254,7 @@ int main(int argc, char*argv[])
     int i,len,rc;
     char *p;
     if(argc<=1) {
-        put2s("automaker: usage: automaker [files ...]\n");
-        put2flush();
-        return 100;
+        strerr_die1x(100,"automaker: usage: automaker [files ...]");
     }
 
     puts("default : it\n");
