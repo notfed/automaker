@@ -281,9 +281,9 @@ int main(int argc, char*argv[])
           && p[len-1] == 'c')) 
         {
           p[len-2] = 0;
-          if(!critbit0_contains(&executables,&p))
-            if(!critbit0_insert(&executables,&pool,&p)) return 1;
         }
+        if(!critbit0_contains(&executables,&p))
+            if(!critbit0_insert(&executables,&pool,&p)) return 1;
 
         /* add module to tree along with its dependents */
         if((rc=dependon(argv[i]))!=0) return rc;
