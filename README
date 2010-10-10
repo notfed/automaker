@@ -4,6 +4,7 @@ Public Domain
 
 This project is meant to automatically create a Makefile for C projects. 
 
+
 For example, given a source file 'test.c': to produce a Makefile that will produce 'test' along with any dependencies:
 
 	$ automaker test.c > Makefile
@@ -21,5 +22,25 @@ automaker opens 'test.c' and looks for a comment section of the following format
 
 	$ automaker test1.c test2.c test3.c > Makefile
 
-	The above constructs a Makefile that creates executables 'test1', 'test2', and 'test3', linking them with all necesary dependencies.
+	The above constructs a Makefile that creates executables 'test1', 'test2', and 'test3', linking them with all necessary dependencies.
+
+
+Example : 
+	'test' is created from 'test.c' and depends on functions from 'dep1.c', 'dep2.c', and 'dep3.c'.
+
+	Sample source code for test.c :
+		/*
+		%use dep1;
+		%use dep2;
+		%use dep3;
+		*/
+		int main()
+		{
+		    dep1_func(); dep2_func(); dep3_func();
+		    return 0;
+		}
+
+	To produce the Makefile to build test:
+
+		$ automaker test.c > Makefile
 
