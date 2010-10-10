@@ -1,8 +1,7 @@
-/* sysdep: int64.h:1-longlong */
-
 #ifndef INT64_H
 #define INT64_H
+#include <stdint.h>
 
-typedef long long int64;
+typedef int64_t int64;
 
 #endif

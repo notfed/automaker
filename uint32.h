@@ -1,8 +1,7 @@
-/* sysdep: uint32.h:1-int */
-
 #ifndef UINT32_H
 #define UINT32_H
+#include <stdint.h>
 
-typedef unsigned int uint32;
+typedef uint32_t uint32;
 
 #endif

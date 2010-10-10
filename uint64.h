@@ -1,8 +1,7 @@
-/* sysdep: uint64.h:1-longlong */
-
 #ifndef UINT64_H
 #define UINT64_H
+#include <stdint.h>
 
-typedef unsigned long long uint64;
+typedef uint64_t uint64;
 
 #endif
