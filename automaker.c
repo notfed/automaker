@@ -28,6 +28,7 @@
 #include "error.h"
 #include "readwrite.h"
 #include "open.h"
+#include "exit.h"
 #include "str.h"
 
 
@@ -69,6 +70,17 @@ static void err_readfailed(str0 dep)
     _exit(111);
 }
 
+static void forceclose(int fd)
+{
+    if(close(fd)==-1) 
+    {
+      put2s("automaker: error: failed failed to close file descriptor\n");
+      put2flush();
+      cleanup();
+      _exit(111);
+    }
+}
+
 /* Read the file {m}.c and read all of its dependencies into the tree */
 static int dependon(str0 m)
 {
@@ -100,10 +112,10 @@ static int dependon(str0 m)
 
     /* Read first line */
     rc = getln(&buffer_f,&line,&match,'\n');
-    if(rc<0) { close(fd); return 1; }
+    if(rc<0) { forceclose(fd); return 1; }
 
     /* Make sure first line is a comment start */
-    if(!str_start(line.s,"/*")) { close(fd); return 0; }
+    if(!str_start(line.s,"/*")) { forceclose(fd); return 0; }
 
     for(;;) {
         
@@ -129,7 +141,7 @@ static int dependon(str0 m)
     } 
 
     /* Done reading this file */
-    close(fd);
+    forceclose(fd);
     return 0;
 }
 
