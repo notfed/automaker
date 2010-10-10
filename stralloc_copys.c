@@ -1,3 +1,7 @@
+/*
+%use stralloc_copyb;
+%use str_len;
+*/
 #include "byte.h"
 #include "str.h"
 #include "stralloc.h"
