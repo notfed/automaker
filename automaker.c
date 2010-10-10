@@ -31,24 +31,19 @@
 #include "exit.h"
 #include "str.h"
 
+#define puts(s) buffer_putsalign(buffer_1,(s))
+#define putflush() buffer_flush(buffer_1)
+#define FATAL "automaker: error: "
 
 static critbit0_tree modules;
 static critbit0_tree nextup;
 static critbit0_tree allmodules;
 static critbit0_tree executables;
 static limitmalloc_pool pool = { 4096 };
-static stralloc line = {0};
-
-/* File read buffer */
+static stralloc line = {0}; 
+static stralloc modc = {0}; 
 static char buffer_f_space[BUFFER_INSIZE];
 static buffer buffer_f;
-
-#define puts(s) buffer_putsalign(buffer_1,(s))
-#define putflush() buffer_flush(buffer_1)
-#define FATAL "automaker: error: "
-
-/* {m}.c */
-static stralloc modc = {0};
 
 static void cleanup()
 {
