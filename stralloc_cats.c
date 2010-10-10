@@ -1,7 +1,6 @@
 /*
 %use stralloc_catb;
 */
-#include "byte.h"
 #include "str.h"
 #include "stralloc.h"
 
