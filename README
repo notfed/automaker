@@ -21,5 +21,5 @@ automaker opens 'test.c' and looks for a comment section of the following format
 
 	$ automaker test1.c test2.c test3.c > Makefile
 
-	Builds a Makefile that creates executables 'test1', 'test2', and 'test3', linking them with all necesary dependencies.
+	The above constructs a Makefile that creates executables 'test1', 'test2', and 'test3', linking them with all necesary dependencies.
 

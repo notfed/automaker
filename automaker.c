@@ -243,7 +243,18 @@ int main(int argc, char*argv[])
         put2flush();
         return 100;
     }
+
     puts("default : it\n");
+    puts("load :\n" 
+        "	echo '#!/bin/sh' > load\n"
+        "	echo 'main=\"$$1\"; shift' >> load\n"
+        "	echo 'exec cc -o \"$$main\" \"$$main\".o $${1+\"$$@\"}' >> load\n"
+        "	chmod +x load\n");
+    puts("compile :\n"
+        "	echo '#!/bin/sh' > compile\n"
+        "	echo 'cc -c $${1+\"$$@\"}' >> compile\n"
+        "	chmod +x compile\n");
+
     for(i=1;i<argc;i++)
     {
         /* grow a new tree */
