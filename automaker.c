@@ -39,7 +39,7 @@ static critbit0_tree modules;
 static critbit0_tree nextup;
 static critbit0_tree allmodules;
 static critbit0_tree executables;
-static limitmalloc_pool pool = { 4096 };
+static limitmalloc_pool pool = { 65536 };
 static stralloc line = {0}; 
 static stralloc modc = {0}; 
 static char buffer_f_space[BUFFER_INSIZE];
