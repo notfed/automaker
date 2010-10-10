@@ -1,7 +1,6 @@
 /*
 %use error;
 */
-#include <errno.h>
 #include "error.h"
 
 #define X(e,s) if (i == e) return s;
