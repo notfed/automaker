@@ -2,7 +2,7 @@ automaker-20101009
 Jay Sullivan
 Public Domain
 
-This project is meant to automatically create a Makefile for C projects. 
+This project is meant to automatically create a Makefile for C projects, provided you declare dependencies explicitly inside source files.  The Makefile's contents are organized in lexical (alphabetical) order.  
 
 
 For example, given a source file 'test.c': to produce a Makefile that will produce 'test' along with any dependencies:
