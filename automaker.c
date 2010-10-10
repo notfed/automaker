@@ -55,7 +55,7 @@ static void cleanup()
 
 static void err_readfailed(str0 dep)
 {
-    strerr_die4sys(111,FATAL,"failed to open '",dep,"'");
+    strerr_die4sys(111,FATAL,"failed to open '",dep,"': ");
 }
 static void err_memsoft()
 {
@@ -69,7 +69,7 @@ static void forceclose(int fd)
 {
     if(close(fd)==-1) 
     {
-      strerr_die2sys(111,FATAL,"failed to close file descriptor");
+      strerr_die2sys(111,FATAL,"failed to close file descriptor: ");
     }
 }
 
