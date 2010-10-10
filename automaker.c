@@ -265,7 +265,7 @@ int main(int argc, char*argv[])
         "	chmod +x load\n");
     puts("compile :\n"
         "	echo '#!/bin/sh' > compile\n"
-        "	echo 'cc -c $${1+\"$$@\"}' >> compile\n"
+        "	echo 'exec cc -c $${1+\"$$@\"}' >> compile\n"
         "	chmod +x compile\n");
 
     for(i=1;i<argc;i++)
