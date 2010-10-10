@@ -1,10 +1,10 @@
-automaker-20101003
+automaker-20101009
 Jay Sullivan
 Public Domain
 
 This project is meant to automatically create a Makefile for C projects. 
 
-For example, given a source file 'test.c' to produce a Makefile that will produce 'test' along with any dependencies:
+For example, given a source file 'test.c': to produce a Makefile that will produce 'test' along with any dependencies:
 
 	$ automaker test.c > Makefile
 
