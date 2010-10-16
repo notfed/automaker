@@ -38,6 +38,7 @@
 static critbit0_tree modules;
 static critbit0_tree nextup;
 static critbit0_tree libs;
+static critbit0_tree objfiles;
 static critbit0_tree allmodules;
 static critbit0_tree executables;
 static limitmalloc_pool pool = { 65536 };
@@ -122,12 +123,24 @@ static int dependon(str0 m)
 
       /* Make sure line is of format "%use MODULE;\n" */
       if(line.len<8) continue;
-      if(!str_start(line.s,"%use ") && !str_start(line.s,"%lib ")) continue;
+      if(!str_start(line.s,"%use ") 
+      && !str_start(line.s,"%lib ")) continue;
       if(line.s[line.len-2]!=';') continue;
+
  
+      if(line.s[line.len-4]=='.' && line.s[line.len-3]=='o')
+      {
+        /* extract just the module name */
+        line.s[line.len-2] = 0;
+        newmod = line.s + 5;
+        if(!critbit0_contains(&objfiles,&newmod))
+          if(!critbit0_insert(&objfiles,&pool,&newmod)) err_memsoft();
+        continue;
+      }
       /* extract just the module name */
       line.s[line.len-2] = 0;
       newmod = line.s + 5;
+
 
       /* Put the name in the tree */
       if(str_start(line.s,"%use "))
@@ -187,6 +200,12 @@ static int loadallibs_callback(void)
     str0_free(&loadall_arg,&pool);
     return 1;
 }
+static int loadallobjfiles_callback(void)
+{
+    puts(" "); puts(loadall_arg);
+    str0_free(&loadall_arg,&pool);
+    return 1;
+}
 static int loadall(str0 modname)
 {
     str0 empty = "";
@@ -196,11 +215,15 @@ static int loadall(str0 modname)
     puts(modname); puts(".o");
     if(critbit0_allprefixed(&nextup, &pool, &loadall_arg, &empty, loadall_callback)!=1)
           err_memsoft();
+    if(critbit0_allprefixed(&objfiles, &pool, &loadall_arg, &empty, loadallobjfiles_callback)!=1)
+          err_memsoft();
     puts("\n");
 
     /* Second line */
     puts("	./load "); puts(modname); 
     if(critbit0_allprefixed(&nextup, &pool, &loadall_arg, &empty, loadall_callback)!=1)
+          err_memsoft();
+    if(critbit0_allprefixed(&objfiles, &pool, &loadall_arg, &empty, loadallobjfiles_callback)!=1)
           err_memsoft();
     if(critbit0_allprefixed(&libs, &pool, &loadall_arg, &empty, loadallibs_callback)!=1)
           err_memsoft();
@@ -288,6 +311,7 @@ int main(int argc, char*argv[])
         critbit0_clear(&modules,&pool);
         critbit0_clear(&nextup,&pool);
         critbit0_clear(&libs,&pool);
+        critbit0_clear(&objfiles,&pool);
 
         /* chop off .c suffix */
         p = argv[i];
