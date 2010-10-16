@@ -37,6 +37,7 @@
 
 static critbit0_tree modules;
 static critbit0_tree nextup;
+static critbit0_tree libs;
 static critbit0_tree allmodules;
 static critbit0_tree executables;
 static limitmalloc_pool pool = { 65536 };
@@ -51,6 +52,7 @@ static void cleanup()
     critbit0_clear(&modules,&pool);
     critbit0_clear(&allmodules,&pool);
     critbit0_clear(&nextup,&pool);
+    critbit0_clear(&libs,&pool);
 }
 
 static void err_readfailed(str0 dep)
@@ -120,7 +122,7 @@ static int dependon(str0 m)
 
       /* Make sure line is of format "%use MODULE;\n" */
       if(line.len<8) continue;
-      if(!str_start(line.s,"%use ")) continue;
+      if(!str_start(line.s,"%use ") && !str_start(line.s,"%lib ")) continue;
       if(line.s[line.len-2]!=';') continue;
  
       /* extract just the module name */
@@ -128,8 +130,17 @@ static int dependon(str0 m)
       newmod = line.s + 5;
 
       /* Put the name in the tree */
-      if(!critbit0_contains(&nextup,&newmod))
-        if(!critbit0_insert(&nextup,&pool,&newmod)) err_memsoft();
+      if(str_start(line.s,"%use "))
+      {
+        if(!critbit0_contains(&nextup,&newmod))
+          if(!critbit0_insert(&nextup,&pool,&newmod)) err_memsoft();
+      }
+      else if(str_start(line.s,"%lib "))
+      {
+        if(!critbit0_contains(&libs,&newmod))
+          if(!critbit0_insert(&libs,&pool,&newmod)) err_memsoft();
+      }
+        
     } 
 
     /* Done reading this file */
@@ -170,6 +181,12 @@ static int loadall_callback(void)
     str0_free(&loadall_arg,&pool);
     return 1;
 }
+static int loadallibs_callback(void)
+{
+    puts(" -l"); puts(loadall_arg);
+    str0_free(&loadall_arg,&pool);
+    return 1;
+}
 static int loadall(str0 modname)
 {
     str0 empty = "";
@@ -184,6 +201,8 @@ static int loadall(str0 modname)
     /* Second line */
     puts("	./load "); puts(modname); 
     if(critbit0_allprefixed(&nextup, &pool, &loadall_arg, &empty, loadall_callback)!=1)
+          err_memsoft();
+    if(critbit0_allprefixed(&libs, &pool, &loadall_arg, &empty, loadallibs_callback)!=1)
           err_memsoft();
     puts("\n");
 
@@ -268,6 +287,7 @@ int main(int argc, char*argv[])
         /* grow a new tree */
         critbit0_clear(&modules,&pool);
         critbit0_clear(&nextup,&pool);
+        critbit0_clear(&libs,&pool);
 
         /* chop off .c suffix */
         p = argv[i];
